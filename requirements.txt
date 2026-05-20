@@ -1,0 +1,30 @@
+# ===== Agent 核心框架 =====
+deepagents==0.4.12              # 主 Agent 框架（create_deep_agent）
+langgraph>=1.0.0                # 状态机底座
+langchain>=1.0.0                # Agent middleware 基类
+langchain-openai>=0.2.0         # OpenAI 兼容模型（DeepSeek/Qwen）
+langchain-mcp-adapters>=0.1.0   # MCP 工具加载（MultiServerMCPClient）
+
+# ===== MCP 数据工具服务 =====
+fastmcp==3.2.4                  # MCP Server 框架
+
+# ===== 大模型与数据 =====
+openai>=1.0.0                   # OpenAI SDK
+akshare>=1.14.0                 # 免费金融数据源（行情/财报/新闻）
+pandas>=2.0.0                   # 数据处理
+numpy>=1.24.0                   # 数值计算
+
+# ===== 存储与持久化 =====
+pymongo>=4.6.0                  # MongoDB 驱动
+langgraph-checkpoint-mongodb>=0.1.0  # MongoDB checkpointer
+redis>=5.0.0                    # Redis 客户端
+
+# ===== Web 服务与通信 =====
+fastapi>=0.110.0                # API 框架
+uvicorn[standard]>=0.27.0       # ASGI 服务器
+httpx>=0.27.0                   # HTTP 客户端（跨项目调用 + MCP）
+sse-starlette>=2.0.0            # SSE 流式响应
+
+# ===== 工具库 =====
+python-dotenv>=1.0.0            # 读取 .env
+pyyaml>=6.0                     # 解析子 Agent YAML 配置

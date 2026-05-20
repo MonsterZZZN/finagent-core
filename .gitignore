@@ -1,0 +1,27 @@
+# ===== Python =====
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# ===== 环境变量与密钥（绝不提交）=====
+.env
+*.key
+
+# ===== 编辑器 =====
+.idea/
+.vscode/
+*.swp
+
+# ===== 运行时产物 =====
+*.log
+download/
+analysis/
+data/*.json
+
+# ===== 系统文件 =====
+.DS_Store
+Thumbs.db
