@@ -66,7 +66,7 @@ async def analyze_portfolio_risk(positions: List[Dict[str, Any]]) -> Dict[str, A
         k = await fetch_kline(p["ticker"])
         if "error" not in k and k.get("bars"):
             closes[p["ticker"]] = [b["收盘"] for b in k["bars"]]
-        await asyncio.sleep(0.3)  # 对数据源友好
+        await asyncio.sleep(0.8)  # 对数据源友好，降低限流概率
 
     var_result: Dict[str, Any] = {}
     if len(closes) == len(positions) and positions:
