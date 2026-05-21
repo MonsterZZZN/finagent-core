@@ -89,9 +89,18 @@ python scripts/var_calculator.py /data/returns.json
 - ❌ 数字必须用脚本计算，**不能让 LLM 估算**
 - ✅ 末尾必须附风险提示
 
+## 期货账户分析流程（持仓含期货时）
+
+期货与股票风险逻辑不同，含期货持仓时走此流程：
+1. 把期货账户（动态权益 + 各持仓）写入 `/data/futures_account.json`
+2. 运行 `python scripts/margin_analyzer.py /data/futures_account.json`
+3. 得到：保证金占用率、各合约强平距离、最危险合约、单品种敞口、方向性集中
+4. 对照 `data/exchange_margin_rules.yaml` 的阈值分档
+5. 解读时参考 `reference/futures_methodology.md`，用"还能反向波动 X% 就追保"这种直观语言
+
 ## 当前已实现脚本
 - ✅ `scripts/concentration.py` —— 集中度
 - ✅ `scripts/var_calculator.py` —— VaR / 波动率
-- ⬜ `scripts/margin_analyzer.py` —— 期货保证金（步骤5b）
-- ⬜ `scripts/stress_test.py` —— 压力测试（步骤5b）
-- ⬜ `scripts/correlation_calc.py` —— 相关性（步骤5b）
+- ✅ `scripts/margin_analyzer.py` —— 期货保证金 / 强平距离 / 方向性集中
+- ⬜ `scripts/stress_test.py` —— 压力测试（步骤5c）
+- ⬜ `scripts/correlation_calc.py` —— 相关性（步骤5c）

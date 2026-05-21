@@ -1,0 +1,41 @@
+# 各交易所主要品种的保证金率与合约乘数（参考值）
+# 注意：实际保证金率随合约月份、波动率动态调整，期货公司通常在交易所基础上加点。
+# 此表用于：1) 缺少 margin_rate 时取默认值；2) 解读时说明杠杆水平。
+
+SHFE:   # 上海期货交易所
+  螺纹钢:   {code: RB, multiplier: 10,   margin_rate: 0.10}   # 10吨/手
+  热卷:     {code: HC, multiplier: 10,   margin_rate: 0.10}
+  铜:       {code: CU, multiplier: 5,    margin_rate: 0.10}   # 5吨/手
+  黄金:     {code: AU, multiplier: 1000, margin_rate: 0.10}   # 1000克/手
+  白银:     {code: AG, multiplier: 15,   margin_rate: 0.12}
+  原油:     {code: SC, multiplier: 1000, margin_rate: 0.15}   # 上能所INE，1000桶/手
+
+DCE:    # 大连商品交易所
+  铁矿石:   {code: I,  multiplier: 100,  margin_rate: 0.12}   # 100吨/手
+  豆粕:     {code: M,  multiplier: 10,   margin_rate: 0.10}
+  焦炭:     {code: J,  multiplier: 100,  margin_rate: 0.12}
+  焦煤:     {code: JM, multiplier: 60,   margin_rate: 0.12}
+  棕榈油:   {code: P,  multiplier: 10,   margin_rate: 0.10}
+
+CZCE:   # 郑州商品交易所
+  棉花:     {code: CF, multiplier: 5,    margin_rate: 0.08}   # 5吨/手
+  白糖:     {code: SR, multiplier: 10,   margin_rate: 0.07}
+  PTA:      {code: TA, multiplier: 5,    margin_rate: 0.08}
+  甲醇:     {code: MA, multiplier: 10,   margin_rate: 0.08}
+
+CFFEX:  # 中国金融期货交易所（股指/国债）
+  沪深300:  {code: IF, multiplier: 300,  margin_rate: 0.12}   # 300元/点
+  上证50:   {code: IH, multiplier: 300,  margin_rate: 0.12}
+  中证500:  {code: IC, multiplier: 200,  margin_rate: 0.14}   # 200元/点
+  中证1000: {code: IM, multiplier: 200,  margin_rate: 0.15}
+
+# 风险提示阈值（账户层面）
+margin_usage_thresholds:
+  watch: 0.60      # 占用率 >60% 关注
+  warn: 0.80       # >80% 警示
+  danger: 0.90     # >90% 危险（接近满仓，跳空易爆）
+
+liquidation_distance_thresholds:   # 强平距离（越小越危险）
+  danger: 0.03     # <3% 危险（一个跌停就可能追保）
+  warn: 0.05       # <5% 警示
+  watch: 0.10      # <10% 关注
