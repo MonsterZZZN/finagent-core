@@ -18,7 +18,10 @@ fi
 case "$1" in
   up)
     echo "📥 拉取最新代码..."
-    git pull
+    if ! git pull; then
+        echo "❌ 代码拉取失败（网络问题？）。代码未更新，请重试或检查 git 远程地址。"
+        exit 1
+    fi
     echo "📦 同步依赖（已装的会跳过）..."
     pip install -q -r requirements.txt || echo "⚠️  部分依赖安装有问题，把报错发给我"
     echo "✅ 更新完成"
