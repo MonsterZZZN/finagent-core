@@ -19,6 +19,13 @@ import asyncio
 import sys
 from pathlib import Path
 
+# 强制 stdin/stdout 用 UTF-8，避免服务器 locale 非 UTF-8 时中文输入报 UnicodeDecodeError
+try:
+    sys.stdin.reconfigure(encoding="utf-8", errors="replace")
+    sys.stdout.reconfigure(encoding="utf-8")
+except Exception:
+    pass
+
 sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
 
 from gateway.channels.cli import CLIChannel  # noqa: E402
