@@ -1,0 +1,33 @@
+# 风险阈值配置（散户级参考值，可按用户风险偏好调整）
+# 三档：watch(关注) / warn(警示) / danger(危险)
+# 解读脚本据此把指标分档，找出超标项。
+
+single_stock_concentration:   # 单股最大集中度
+  watch: 0.15
+  warn: 0.25
+  danger: 0.40
+
+stock_hhi:                    # 个股 HHI
+  watch: 0.20
+  warn: 0.30
+  danger: 0.50
+
+industry_hhi:                 # 行业 HHI
+  watch: 0.25
+  warn: 0.40
+  danger: 0.60
+
+volatility_annual:            # 年化波动率
+  watch: 0.25
+  warn: 0.35
+  danger: 0.50
+
+var_1d_95:                    # 1日95% VaR
+  watch: 0.02
+  warn: 0.04
+  danger: 0.07
+
+# 说明：
+# - 集中度/HHI 越高越集中，超过对应档位即提示
+# - 波动率/VaR 越高风险越大
+# - 这些是经验参考值，不同风险偏好的用户可调整
