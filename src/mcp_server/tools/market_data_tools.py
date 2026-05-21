@@ -17,8 +17,6 @@ import asyncio
 from datetime import datetime, timedelta
 from typing import Optional
 
-from fastmcp import FastMCP
-
 GROUP_NAME = "market_data"
 
 
@@ -123,8 +121,8 @@ async def fetch_index() -> dict:
 # 二、注册为 MCP 工具
 # ============================================================
 
-def register_market_data_tools(mcp: FastMCP):
-    """把行情工具注册到 MCP Server。"""
+def register_market_data_tools(mcp):
+    """把行情工具注册到 MCP Server（mcp 为 FastMCP 实例）。"""
 
     @mcp.tool(name=f"{GROUP_NAME}_quote")
     async def market_data_quote(symbol: str) -> dict:
