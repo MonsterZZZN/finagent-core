@@ -1,9 +1,9 @@
-# ===== Agent 核心框架 =====
-deepagents==0.4.12              # 主 Agent 框架（create_deep_agent）
-langgraph>=1.0.0                # 状态机底座
-langchain>=1.0.0                # Agent middleware 基类
+# ===== Agent 核心框架（直接用 LangGraph，不用 DeepAgents/沙箱）=====
+langgraph>=0.2.0                # 状态机底座 + create_react_agent
+langchain>=0.3.0               # 工具/消息基类
+langchain-core>=0.3.0          # @tool 装饰器、消息类型
 langchain-openai>=0.2.0         # OpenAI 兼容模型（DeepSeek/Qwen）
-langchain-mcp-adapters>=0.1.0   # MCP 工具加载（MultiServerMCPClient）
+langchain-mcp-adapters>=0.1.0   # MCP 工具加载（可选，给外部客户端用）
 
 # ===== MCP 数据工具服务 =====
 fastmcp==3.2.4                  # MCP Server 框架
