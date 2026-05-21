@@ -37,6 +37,10 @@ REDIS_URL = os.getenv("REDIS_URL", "redis://127.0.0.1:6379/0")
 RESEARCH_SERVICE_URL = os.getenv("RESEARCH_SERVICE_URL", "")
 KB_SERVICE_URL = os.getenv("KB_SERVICE_URL", "")
 
+# ===== 飞书渠道 =====
+FEISHU_APP_ID = os.getenv("FEISHU_APP_ID", "")
+FEISHU_APP_SECRET = os.getenv("FEISHU_APP_SECRET", "")
+
 # ===== MCP Server =====
 MCP_HOST = os.getenv("MCP_HOST", "127.0.0.1")
 MCP_PORT = int(os.getenv("MCP_PORT", "8003"))
