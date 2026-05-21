@@ -18,11 +18,13 @@ from langgraph.prebuilt import create_react_agent
 from agent.config import get_main_model
 from agent.memory.prompts import system_prompt
 from agent.subagents.market_pulse import build_market_pulse
+from agent.subagents.report_writer import build_report_writer
 from agent.subagents.risk_analyst import build_risk_analyst
 
 # 子 Agent 单例（避免每次委派都重建，省时省 token）
 _risk_analyst = None
 _market_pulse = None
+_report_writer = None
 
 
 def _get_risk_analyst():
@@ -37,6 +39,13 @@ def _get_market_pulse():
     if _market_pulse is None:
         _market_pulse = build_market_pulse()
     return _market_pulse
+
+
+def _get_report_writer():
+    global _report_writer
+    if _report_writer is None:
+        _report_writer = build_report_writer()
+    return _report_writer
 
 
 @tool
@@ -78,6 +87,24 @@ async def delegate_to_market_pulse(request: str) -> str:
     return result["messages"][-1].content
 
 
+@tool
+async def delegate_to_report_writer(request: str) -> str:
+    """
+    委派给报告生成专家。
+
+    适用于：早盘简报、收盘复盘、持仓报告、个股简报等结构化报告需求。
+
+    Args:
+        request: 用户的报告需求（含报告类型；若涉及持仓需附持仓数据）。
+
+    Returns:
+        报告生成专家生成的结构化 Markdown 报告。
+    """
+    agent = _get_report_writer()
+    result = await agent.ainvoke({"messages": [HumanMessage(content=request)]})
+    return result["messages"][-1].content
+
+
 def build_main_agent(checkpointer=None):
     """
     构建主 Agent。
@@ -91,7 +118,11 @@ def build_main_agent(checkpointer=None):
     model = get_main_model()
     return create_react_agent(
         model=model,
-        tools=[delegate_to_risk_analyst, delegate_to_market_pulse],
+        tools=[
+            delegate_to_risk_analyst,
+            delegate_to_market_pulse,
+            delegate_to_report_writer,
+        ],
         prompt=system_prompt,
         checkpointer=checkpointer,
     )

@@ -15,10 +15,12 @@ system_prompt = """
   → 调用 `delegate_to_risk_analyst`
 - 大盘状态 / 指数 / 涨跌家数 / 热点板块 / 个股行情 / "今天市场怎么样"
   → 调用 `delegate_to_market_pulse`
+- 早盘简报 / 收盘复盘 / 持仓报告 / 个股简报 等结构化报告
+  → 调用 `delegate_to_report_writer`
 - 简单问候 / 功能介绍 / 通用金融知识
   → 直接回答
 
-（后续会接入更多专家：报告生成、深度研究等）
+（后续会接入：深度研究 research-proxy 等）
 
 ## 委派规则（重要）
 调用 `delegate_to_risk_analyst` 时，`request` 参数必须包含：
