@@ -135,6 +135,41 @@ async def fetch_index() -> dict:
         return {"error": f"获取指数失败: {e}"}
 
 
+async def fetch_market_overview() -> dict:
+    """获取大盘概览：上涨/下跌家数、涨停/跌停数、市场活跃度。"""
+    import akshare as ak
+    try:
+        df = await _retry(ak.stock_market_activity_legu)
+        # 返回 item/value 两列
+        data = dict(zip(df["item"], df["value"]))
+        return {
+            "上涨家数": data.get("上涨"),
+            "下跌家数": data.get("下跌"),
+            "平盘": data.get("平盘"),
+            "涨停": data.get("涨停"),
+            "跌停": data.get("跌停"),
+            "停牌": data.get("停牌"),
+            "活跃度": data.get("活跃度"),
+            "统计日期": data.get("统计日期"),
+        }
+    except Exception as e:
+        return {"error": f"获取大盘概览失败: {e}"}
+
+
+async def fetch_hot_sectors(top_n: int = 5) -> dict:
+    """获取今日领涨/领跌行业板块。"""
+    import akshare as ak
+    try:
+        df = await _retry(ak.stock_board_industry_name_em)
+        df = df.sort_values("涨跌幅", ascending=False)
+        cols = ["板块名称", "涨跌幅"]
+        top = df.head(top_n)[cols].to_dict("records")
+        bottom = df.tail(top_n)[cols].to_dict("records")
+        return {"领涨板块": top, "领跌板块": bottom}
+    except Exception as e:
+        return {"error": f"获取热点板块失败: {e}"}
+
+
 # ============================================================
 # 二、注册为 MCP 工具
 # ============================================================
@@ -176,3 +211,13 @@ def register_market_data_tools(mcp):
     async def market_data_index() -> dict:
         """查询主要指数实时快照（上证指数、深证成指、创业板指、沪深300）。"""
         return await fetch_index()
+
+    @mcp.tool(name=f"{GROUP_NAME}_overview")
+    async def market_data_overview() -> dict:
+        """查询大盘概览：上涨/下跌家数、涨停/跌停数、市场活跃度。"""
+        return await fetch_market_overview()
+
+    @mcp.tool(name=f"{GROUP_NAME}_hot_sectors")
+    async def market_data_hot_sectors() -> dict:
+        """查询今日领涨/领跌行业板块。"""
+        return await fetch_hot_sectors()

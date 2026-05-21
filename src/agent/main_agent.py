@@ -17,10 +17,12 @@ from langgraph.prebuilt import create_react_agent
 
 from agent.config import get_main_model
 from agent.memory.prompts import system_prompt
+from agent.subagents.market_pulse import build_market_pulse
 from agent.subagents.risk_analyst import build_risk_analyst
 
 # 子 Agent 单例（避免每次委派都重建，省时省 token）
 _risk_analyst = None
+_market_pulse = None
 
 
 def _get_risk_analyst():
@@ -28,6 +30,13 @@ def _get_risk_analyst():
     if _risk_analyst is None:
         _risk_analyst = build_risk_analyst()
     return _risk_analyst
+
+
+def _get_market_pulse():
+    global _market_pulse
+    if _market_pulse is None:
+        _market_pulse = build_market_pulse()
+    return _market_pulse
 
 
 @tool
@@ -50,6 +59,25 @@ async def delegate_to_risk_analyst(request: str) -> str:
     return result["messages"][-1].content
 
 
+@tool
+async def delegate_to_market_pulse(request: str) -> str:
+    """
+    委派给市场监控专家。
+
+    适用于：大盘状态、指数行情、涨跌家数、热点/领涨领跌板块、
+    单只个股实时行情、"今天市场怎么样"等市场查询。
+
+    Args:
+        request: 用户的完整市场查询需求。
+
+    Returns:
+        市场监控专家的市场状态描述。
+    """
+    agent = _get_market_pulse()
+    result = await agent.ainvoke({"messages": [HumanMessage(content=request)]})
+    return result["messages"][-1].content
+
+
 def build_main_agent(checkpointer=None):
     """
     构建主 Agent。
@@ -63,7 +91,7 @@ def build_main_agent(checkpointer=None):
     model = get_main_model()
     return create_react_agent(
         model=model,
-        tools=[delegate_to_risk_analyst],
+        tools=[delegate_to_risk_analyst, delegate_to_market_pulse],
         prompt=system_prompt,
         checkpointer=checkpointer,
     )
