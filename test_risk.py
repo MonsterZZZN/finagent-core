@@ -83,6 +83,7 @@ async def main():
             print(f"  ❌ {p['name']} K线获取失败: {k['error']}")
             return
         closes[p["ticker"]] = [b["收盘"] for b in k["bars"]]
+        await asyncio.sleep(0.5)  # 对数据源友好，降低被限流概率
 
     # 合成组合日收益率
     total = sum(p["market_value"] for p in SAMPLE)

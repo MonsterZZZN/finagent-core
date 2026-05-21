@@ -20,6 +20,24 @@ from typing import Optional
 GROUP_NAME = "market_data"
 
 
+async def _retry(func, *args, retries: int = 3, delay: float = 1.0, **kwargs):
+    """
+    带退避重试地在线程里执行同步函数。
+
+    AKShare 数据源（东方财富等）偶发连接中断，连续请求时尤甚。
+    用重试 + 递增延迟来抵抗瞬时网络错误。
+    """
+    last_err = None
+    for attempt in range(retries):
+        try:
+            return await asyncio.to_thread(func, *args, **kwargs)
+        except Exception as e:
+            last_err = e
+            if attempt < retries - 1:
+                await asyncio.sleep(delay * (attempt + 1))  # 1s, 2s, ...
+    raise last_err
+
+
 # ============================================================
 # 一、核心数据获取逻辑（可独立测试）
 # ============================================================
@@ -34,7 +52,7 @@ async def fetch_quote(symbol: str) -> dict:
     import akshare as ak
     try:
         # stock_bid_ask_em 返回单只股票的盘口 + 关键行情，数据量小
-        df = await asyncio.to_thread(ak.stock_bid_ask_em, symbol=symbol)
+        df = await _retry(ak.stock_bid_ask_em, symbol=symbol)
         # df 为 item/value 两列，转成字典
         data = dict(zip(df["item"], df["value"]))
         return {
@@ -81,7 +99,7 @@ async def fetch_kline(
         if start_date is None:
             start_date = (datetime.now() - timedelta(days=60)).strftime("%Y%m%d")
 
-        df = await asyncio.to_thread(
+        df = await _retry(
             ak.stock_zh_a_hist,
             symbol=symbol,
             period=period,
@@ -100,7 +118,7 @@ async def fetch_index() -> dict:
     """获取主要指数实时快照（上证/深证/创业板/沪深300）。"""
     import akshare as ak
     try:
-        df = await asyncio.to_thread(ak.stock_zh_index_spot_em, symbol="沪深重要指数")
+        df = await _retry(ak.stock_zh_index_spot_em, symbol="沪深重要指数")
         majors = ["上证指数", "深证成指", "创业板指", "沪深300"]
         result = []
         for _, row in df.iterrows():
