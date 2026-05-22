@@ -17,10 +17,11 @@ system_prompt = """
   → 调用 `delegate_to_market_pulse`
 - 早盘简报 / 收盘复盘 / 持仓报告 / 个股简报 等结构化报告
   → 调用 `delegate_to_report_writer`
+- 深度研究 / 深度分析某公司投资价值 / 对比行业竞争格局 / 研究某行业机会
+  （需要多步搜索 + 综合分析的深度研究）
+  → 调用 `delegate_to_research`（异步，会先告知用户"正在研究"）
 - 简单问候 / 功能介绍 / 通用金融知识
   → 直接回答
-
-（后续会接入：深度研究 research-proxy 等）
 
 ## 委派规则（重要）
 调用 `delegate_to_risk_analyst` 时，`request` 参数必须包含：

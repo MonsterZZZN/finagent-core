@@ -10,6 +10,7 @@ Gateway —— 网关调度中心。
 Gateway 完全不关心消息来自哪个平台——这是"一个 Agent 服务多端"的关键。
 """
 
+from agent.tools.research_tool import current_notifier
 from gateway.contracts import InboundMessage, OutboundMessage
 from gateway.registry import ChannelRegistry
 from gateway.runtime import get_runtime
@@ -43,20 +44,29 @@ class Gateway:
         因此对 CLI / 飞书 / 未来其他渠道的处理完全一致。
         """
         session_key = resolve_session_key(message)
+        channel = self.registry.get(message.channel)
 
-        # 进入统一 Agent 主线（不关心平台）
-        reply_text = await self.runtime.run_for_session(
-            session_key=session_key,
-            user_message=message.text,
-            context={
-                "channel": message.channel,
-                "sender_id": message.sender_id,
-                "conversation_id": message.conversation_id,
-            },
-        )
+        # 设置 notifier：供异步任务（如深度研究）完成后把结果推回当前会话
+        async def _notify(text: str) -> None:
+            if channel:
+                await channel.send(message.conversation_id, OutboundMessage(text=text))
+
+        token = current_notifier.set(_notify)
+        try:
+            # 进入统一 Agent 主线（不关心平台）
+            reply_text = await self.runtime.run_for_session(
+                session_key=session_key,
+                user_message=message.text,
+                context={
+                    "channel": message.channel,
+                    "sender_id": message.sender_id,
+                    "conversation_id": message.conversation_id,
+                },
+            )
+        finally:
+            current_notifier.reset(token)
 
         # 回复交给对应渠道（飞书会用 reply_to_id 回复原消息）
-        channel = self.registry.get(message.channel)
         if channel:
             reply_to = message.raw.get("message_id")
             outbound = OutboundMessage(text=reply_text, reply_to_id=reply_to)

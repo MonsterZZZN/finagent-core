@@ -20,6 +20,7 @@ from agent.memory.prompts import system_prompt
 from agent.subagents.market_pulse import build_market_pulse
 from agent.subagents.report_writer import build_report_writer
 from agent.subagents.risk_analyst import build_risk_analyst
+from agent.tools.research_tool import delegate_to_research
 
 # 子 Agent 单例（避免每次委派都重建，省时省 token）
 _risk_analyst = None
@@ -122,6 +123,7 @@ def build_main_agent(checkpointer=None):
             delegate_to_risk_analyst,
             delegate_to_market_pulse,
             delegate_to_report_writer,
+            delegate_to_research,
         ],
         prompt=system_prompt,
         checkpointer=checkpointer,
