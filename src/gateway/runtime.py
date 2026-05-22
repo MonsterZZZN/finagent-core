@@ -10,11 +10,13 @@ Agent Runtime —— 平台无关的运行时封装。
 """
 
 from typing import Optional
+from uuid import uuid4
 
 from langchain_core.messages import HumanMessage
 from langgraph.checkpoint.memory import MemorySaver
 
 from agent.main_agent import build_main_agent
+from observability.handler import ObservabilityHandler
 
 
 class AgentRuntime:
@@ -43,7 +45,17 @@ class AgentRuntime:
         Returns:
             Agent 的回复文本
         """
-        config = {"configurable": {"thread_id": session_key}}
+        # 每个请求一个 trace_id，挂上可观测性 handler
+        # callbacks 会沿调用树传播，捕获主 Agent + 工具 + 子 Agent 的全部调用
+        handler = ObservabilityHandler(
+            trace_id=uuid4().hex,
+            session_id=session_key,
+            channel=(context or {}).get("channel", ""),
+        )
+        config = {
+            "configurable": {"thread_id": session_key},
+            "callbacks": [handler],
+        }
         result = await self._agent.ainvoke(
             {"messages": [HumanMessage(content=user_message)]},
             config=config,
