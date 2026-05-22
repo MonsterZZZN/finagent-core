@@ -22,10 +22,17 @@ from observability.store import trace_store
 class ObservabilityHandler(BaseCallbackHandler):
     """全链路埋点 handler。"""
 
-    def __init__(self, trace_id: str, session_id: str = "", channel: str = "") -> None:
+    def __init__(
+        self,
+        trace_id: str,
+        session_id: str = "",
+        channel: str = "",
+        service: str = "finagent-core",
+    ) -> None:
         self.trace_id = trace_id
         self.session_id = session_id
         self.channel = channel
+        self.service = service
         # run_id -> {开始时间, 类型, 名称, 父run_id}
         self._starts: dict[str, dict] = {}
 
@@ -133,6 +140,7 @@ class ObservabilityHandler(BaseCallbackHandler):
             "name": info["name"],
             "session_id": self.session_id,
             "channel": self.channel,
+            "service": self.service,
             "latency_ms": latency_ms,
             "status": status,
             "ts": datetime.utcnow(),
